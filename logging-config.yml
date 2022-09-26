@@ -7,7 +7,7 @@ handlers:
   rotateAccess:
     class: logging.handlers.RotatingFileHandler
     level: INFO
-    filename: '<PATH>logs/access.log'
+    filename: '<PATH>/logs/access.log'
     maxBytes: 1048576
     backupCount: 5
     formatter: simple

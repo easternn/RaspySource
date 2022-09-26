@@ -5,5 +5,5 @@ import yaml
 source_path = '<PATH>'
 with open(source_path + '/logging-config.yml', 'r') as logconf:
     logging_config = yaml.load(logconf, Loader=yaml.FullLoader)
-logging.config.dictConfig(config)
+logging.config.dictConfig(logging_config)
 logger = logging.getLogger('logger')
