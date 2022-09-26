@@ -1,0 +1,32 @@
+version: 1
+disable_existing_loggers: true
+formatters:
+  simple:
+    format: '[%(levelname)s]: %(asctime)s - %(message)s'
+handlers:
+  rotateAccess:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    filename: '/home/pi/raspdev/logs/access.log'
+    maxBytes: 1048576
+    backupCount: 5
+    formatter: simple
+  rotateError:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    filename: '/home/pi/raspdev/logs/error.log'
+    maxBytes: 1048576
+    backupCount: 5
+    formatter: simple
+  console:
+    class : logging.StreamHandler
+    level: INFO
+    formatter: simple
+loggers:
+  logger:
+    level: INFO
+    handlers: [rotateAccess,rotateError,console]
+    qualname: logger
+    propagate: no
+root:
+  level: DEBUG
