@@ -1,4 +1,5 @@
 import metric
+import time
 from logger import logger
 from w1thermsensor import W1ThermSensor, Sensor, Unit
 

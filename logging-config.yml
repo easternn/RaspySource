@@ -7,14 +7,14 @@ handlers:
   rotateAccess:
     class: logging.handlers.RotatingFileHandler
     level: INFO
-    filename: '/home/pi/raspdev/logs/access.log'
+    filename: '<PATH>logs/access.log'
     maxBytes: 1048576
     backupCount: 5
     formatter: simple
   rotateError:
     class: logging.handlers.RotatingFileHandler
     level: ERROR
-    filename: '/home/pi/raspdev/logs/error.log'
+    filename: '<PATH>/logs/error.log'
     maxBytes: 1048576
     backupCount: 5
     formatter: simple

@@ -1,20 +1,17 @@
-source_path = ''
+source_path = '<PATH>'
 import sys
-sys.path.append(source_path + 'modules')
+sys.path.append(source_path + '/modules')
 
 from datetime import datetime
 import requests
 import time
-import configparser
 import collectors
 import stat
 from logger import logger
 
 loop_period = 30
-source_config = configparser.ConfigParser()
-source_config.read(source_path + 'source-config.ini')
-API_URL = source_config['DEFAULT']['API_URL']
-API_TOKEN = source_config['DEFAULT']['API_TOKEN']
+API_URL = '<API_URL>'
+API_TOKEN = '<API_TOKEN>'
 
 
 def Gather(log_namespace):
