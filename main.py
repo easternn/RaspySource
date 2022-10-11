@@ -5,41 +5,63 @@ sys.path.append(source_path + '/modules')
 from datetime import datetime
 import requests
 import time
-import collectors
-import stat
+import i2c
+import metric
 from logger import logger
 
 loop_period = 30
 API_URL = '<API_URL>'
 API_TOKEN = '<API_TOKEN>'
+sensors = 
+	[	{'sensorType': 'Current', 'fieldName': 'c1'}, 
+		{'sensorType': 'Flow', 'fieldName': 'f1'}, 
+		{'sensorType': 'Gercon', 'fieldName': 'g1'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't1'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't2'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't3'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't4'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't5'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't6'}, 
+		{'sensorType': 'Temperature', 'fieldName': 't7'}, 
+	]
 
 
 def Gather(log_namespace):
 	"""
 		Description:
-			Gather data from collectors
+			Gather data from i2c
 		accept:
 			log_namespace - for local logging
 		return:
-			success/fail (bool)
-			time of execution (float)
 			array of sensors in TVD format (list)
-			array of read times of sensors (list)
 	"""
 	start = time.time()
 
 	tvd = []
 	rst = {}
 	check = True
+	try:
+		read_start = time.time()
+		data = i2c.read_i2c(100)
+		read_finish = time.time()
+		read_unix = round((read_start + read_finish) / 2)
+	except Exception as e:
+		logger.error(log_namespace + " - Error while reading from i2c " + str(e))
+	else:
+		mapped = {}
+		for elem in data.split(';'):
+			key, value = elem.split('=')
+			mapped[key] = value
+		for sensor in sensors:
+			if sensor['fieldName'] not in mapped.keys():
+				logger.warning(log_namespace + " - Sensor not found: " + sensor['fieldName'])
+			else:
+				tvd.append(metric.MakeMetric(sensor['sensorType'], sensor['fieldName'], mapped[sensor['fieldName']], read_unix))
 
-	check_collector_1, tvd_collector_1, rst_collector_1 = collectors.Collector_1(log_namespace + ":" + "temp-DS18B20", "temp-DS18B20", "SENSOR_temp-DS18B20_")
-	tvd += tvd_collector_1
-	rst.update(rst_collector_1)
-	check = check and check_collector_1
-
+	print(tvd)
 	finish = time.time()
 	logger.info(log_namespace + " - " + "Gather time: " + str(round(finish - start, 2)))
-	return check, finish - start, tvd, rst
+	return finish - start, tvd
 
 def ServerRequest(log_namespace, payload):
 	"""
@@ -84,11 +106,8 @@ def Loop(log_namespace):
 		iter_start = time.time()
 		check = True
 
-		check_gather, gather_time, tvd, rst = Gather(log_namespace + ":" + "SENSORS")
-		check_server, server_time = ServerRequest(log_namespace + ":" + "SERVER", tvd)
-		check = check_gather and check_server
-
-		# UpdateStat(check_gather, gather_time, rst, check_telegraf, telegraf_time, check, iter_start)
+		tvd = Gather(log_namespace + ":" + "SENSORS")
+		ServerRequest(log_namespace + ":" + "SERVER", tvd)
 
 		iter_finish = time.time()
 		iter_time = iter_finish - iter_start

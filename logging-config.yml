@@ -13,7 +13,7 @@ handlers:
     formatter: simple
   rotateError:
     class: logging.handlers.RotatingFileHandler
-    level: ERROR
+    level: WARNING
     filename: '<PATH>/logs/error.log'
     maxBytes: 1048576
     backupCount: 5

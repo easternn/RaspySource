@@ -43,4 +43,7 @@ def Collector_1(log_namespace, sensor_type, field_key_prefix):
 				tvd.append(metric.MakeMetric(sensor_type, field_key_prefix + str(map_sensor_id[sensor.id]), value, avg))
 				rst[field_key_prefix + str(map_sensor_id[sensor.id])] = finish - start
 	finally:
+		for [key, value] in rst.items():
+			if value is None:
+				logger.warning(log_namespace + " - Sensor not found - " + str(key))
 		return (check and len(tvd) == len(map_sensor_id)), tvd, rst
