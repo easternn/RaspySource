@@ -39,26 +39,22 @@ def Gather(log_namespace):
 
 	tvd = []
 	rst = {}
+	mapped = {}
 	check = True
 	try:
 		read_start = time.time()
-		data = i2c.read_i2c(100)
+		mapped = i2c.read_i2c()
 		read_finish = time.time()
 		read_unix = round((read_start + read_finish) / 2)
 	except Exception as e:
 		logger.error(log_namespace + " - Error while reading from i2c " + str(e))
 	else:
-		mapped = {}
-		for elem in data.split(';'):
-			key, value = elem.split('=')
-			mapped[key] = value
 		for sensor in sensors:
 			if sensor['fieldName'] not in mapped.keys():
 				logger.warning(log_namespace + " - Sensor not found: " + sensor['fieldName'])
 			else:
 				tvd.append(metric.MakeMetric(sensor['sensorType'], sensor['fieldName'], mapped[sensor['fieldName']], read_unix))
-
-	print(tvd)
+				
 	finish = time.time()
 	logger.info(log_namespace + " - " + "Gather time: " + str(round(finish - start, 2)))
 	return finish - start, tvd
@@ -107,7 +103,8 @@ def Loop(log_namespace):
 		check = True
 
 		tvd = Gather(log_namespace + ":" + "SENSORS")
-		ServerRequest(log_namespace + ":" + "SERVER", tvd)
+		print(tvd)
+		# ServerRequest(log_namespace + ":" + "SERVER", tvd)
 
 		iter_finish = time.time()
 		iter_time = iter_finish - iter_start
